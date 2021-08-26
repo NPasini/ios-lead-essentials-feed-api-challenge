@@ -9,6 +9,8 @@
 import Foundation
 
 internal struct FeedImageMapper: Decodable {
+	private static var OK_200: Int { return 200 }
+
 	private struct Root: Decodable {
 		let items: [Image]
 
@@ -35,8 +37,8 @@ internal struct FeedImageMapper: Decodable {
 		}
 	}
 
-	internal static func map(data: Data) -> FeedLoader.Result {
-		guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
+	internal static func map(data: Data, from response: HTTPURLResponse) -> FeedLoader.Result {
+		guard response.statusCode == FeedImageMapper.OK_200, let root = try? JSONDecoder().decode(Root.self, from: data) else {
 			return .failure(RemoteFeedLoader.Error.invalidData)
 		}
 
